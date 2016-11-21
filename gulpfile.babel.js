@@ -123,6 +123,7 @@ gulp.task('watch', ['lint', 'babel'], () => {
   $.livereload.listen();
 
   gulp.watch([
+    'app/manifest.json',
     'app/*.html',
     'app/scripts/**/*.js',
     'app/images/**/*',

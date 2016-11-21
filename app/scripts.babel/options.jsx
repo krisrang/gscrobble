@@ -1,15 +1,14 @@
-import React from 'react';
-
+/* global React */
 'use strict';
 
-var Options = React.createClass({
-  render: function() {    
-    return (
-      <div>
-        <h1>Test</h1>
-      </div>
-    );
+class Options extends React.Component {
+  shouldComponentUpdate () {
+    return false;
   }
-});
+  
+  render() {
+    return <div><h1>{'Test'}</h1></div>;
+  }
+}
 
-// React.render(<Options />, document.getElementById('accessgranted'));
+ReactDOM.render(<Options />, document.getElementById('accessgranted'));
