@@ -10,6 +10,7 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "bower_components/raven-js/dist/raven.js",
       "scripts/chromereload.js",
       "scripts/background.js"
     ]
@@ -30,6 +31,7 @@
         "*://play.google.com/music/*"
       ],
       "js": [
+        "bower_components/raven-js/dist/raven.js",
         "scripts/contentscript.js"
       ],
       "run_at": "document_end",
@@ -47,8 +49,8 @@
   "commands": {
     "thumbs-up-track": {
       "suggested_key": {
-        "default": "Ctrl+Shift+L",
-        "mac": "MacCtrl+Shift+L"
+        "default": "Ctrl+Shift+S",
+        "mac": "MacCtrl+Shift+S"
       },
       "description": "Thumbs Up current track",
       "global": true

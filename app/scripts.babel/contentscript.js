@@ -1,7 +1,9 @@
-'use strict';
+import config from './common/config';
 
-var scrapeInterval,
-    previousTrack;
+Raven.config(config.ravenDSN).install()
+
+let scrapeInterval,
+    previousData;
 
 function extensionConnected() {
   return chrome.runtime && !!chrome.runtime.getManifest();
@@ -66,13 +68,13 @@ function scrape() {
   };
 }
 
-function trackDifferent(track) {
+function dataDifferent(data) {
   let keys = ['album', 'artist', 'duration', 'elapsed', 'title', 'playing', 'thumbed', 'defaultImage'];
   
   for (let i = 0; i < keys.length; i++) {
     let key = keys[i];
     
-    if (previousTrack[key] !== track[key]) {
+    if (previousData[key] !== data[key]) {
       return true;
     }
   }
@@ -80,10 +82,6 @@ function trackDifferent(track) {
 }
 
 function thumbUpTrack() {
-  if (thumbedUp) {
-    return;
-  }
-  
   let btn = document.querySelector('#player .player-rating-container [icon^="sj:thumb-"][data-rating="5"]');  
   btn && btn.click();
 }
@@ -98,15 +96,15 @@ function messageHandler(msg) {
 
 function updateData() {
   if (extensionConnected()) {
-    let track = scrape();
+    let data = scrape();
     
-    if (!previousTrack || trackDifferent(track)) {
+    if (!previousData || dataDifferent(data)) {
       chrome.runtime.sendMessage({
         name: 'nowplaying',
-        message: track
+        message: data
       });
        
-      previousTrack = track;
+      previousData = data;
     }
   } else {
     scrapeInterval && clearInterval(scrapeInterval);
