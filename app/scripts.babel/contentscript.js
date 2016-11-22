@@ -1,19 +1,20 @@
 'use strict';
 
-var scrapeInterval;
+var scrapeInterval,
+    previousTrack;
 
 function extensionConnected() {
   return chrome.runtime && !!chrome.runtime.getManifest();
 }
 
 function getText(selector) {
-  var el = document.querySelector(selector);
+  let el = document.querySelector(selector);
   return el ? el.textContent : null;
 }
 
 function calculateDuration(timestring) {
-  var i, j, max, pow, timeSegments;
-  var seconds = 0;
+  let i, j, max, pow, timeSegments;
+  let seconds = 0;
 
   if (!timestring) {
     return seconds;
@@ -35,12 +36,12 @@ function calculateDuration(timestring) {
 }
 
 function thumbedUp() {
-  var el = document.querySelector('.song-row.currently-playing [data-col=rating]');
+  let el = document.querySelector('.song-row.currently-playing [data-col=rating]');
   return el ? el.dataset.rating === '5' : false;
 }
 
 function getAlbumArt() {
-  var art = document.querySelector('#playerBarArt');
+  let art = document.querySelector('#playerBarArt');
   return art ? art.src : null;
 }
 
@@ -65,12 +66,25 @@ function scrape() {
   };
 }
 
+function trackDifferent(track) {
+  let keys = ['album', 'artist', 'duration', 'elapsed', 'title', 'playing', 'thumbed', 'defaultImage'];
+  
+  for (let i = 0; i < keys.length; i++) {
+    let key = keys[i];
+    
+    if (previousTrack[key] !== track[key]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function thumbUpTrack() {
   if (thumbedUp) {
     return;
   }
   
-  var btn = document.querySelector('#player .player-rating-container [icon^="sj:thumb-"][data-rating="5"]');  
+  let btn = document.querySelector('#player .player-rating-container [icon^="sj:thumb-"][data-rating="5"]');  
   btn && btn.click();
 }
 
@@ -84,14 +98,16 @@ function messageHandler(msg) {
 
 function updateData() {
   if (extensionConnected()) {
-    // console.time('scrape');
-
-    chrome.runtime.sendMessage({
-      name: 'nowplaying',
-      message: scrape()
-    });
+    let track = scrape();
     
-    // console.timeEnd('scrape');
+    if (!previousTrack || trackDifferent(track)) {
+      chrome.runtime.sendMessage({
+        name: 'nowplaying',
+        message: track
+      });
+       
+      previousTrack = track;
+    }
   } else {
     scrapeInterval && clearInterval(scrapeInterval);
     console.log('gscrobble:: old instance disconnected');

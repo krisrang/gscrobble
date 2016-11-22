@@ -66,5 +66,6 @@
         "jsx": true
       }
     }
-  }
+  },
+  "dependencies": {}
 }
