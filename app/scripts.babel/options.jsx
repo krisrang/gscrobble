@@ -1,5 +1,4 @@
-/* global React */
-'use strict';
+/* global React, ReactDOM */
 
 class Options extends React.Component {
   shouldComponentUpdate () {

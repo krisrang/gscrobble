@@ -1,6 +1,7 @@
+/* global Raven */
 import config from './common/config';
 
-Raven.config(config.ravenDSN).install()
+Raven.config(config.ravenDSN).install();
 
 let scrapeInterval,
     previousData;
@@ -10,7 +11,7 @@ function extensionConnected() {
 }
 
 function getText(selector) {
-  let el = document.querySelector(selector);
+  const el = document.querySelector(selector);
   return el ? el.textContent : null;
 }
 
@@ -38,12 +39,12 @@ function calculateDuration(timestring) {
 }
 
 function thumbedUp() {
-  let el = document.querySelector('.song-row.currently-playing [data-col=rating]');
+  const el = document.querySelector('.song-row.currently-playing [data-col=rating]');
   return el ? el.dataset.rating === '5' : false;
 }
 
 function getAlbumArt() {
-  let art = document.querySelector('#playerBarArt');
+  const art = document.querySelector('#playerBarArt');
   return art ? art.src : null;
 }
 
@@ -69,10 +70,10 @@ function scrape() {
 }
 
 function dataDifferent(data) {
-  let keys = ['album', 'artist', 'duration', 'elapsed', 'title', 'playing', 'thumbed', 'defaultImage'];
+  const keys = ['album', 'artist', 'duration', 'elapsed', 'title', 'playing', 'thumbed', 'defaultImage'];
   
   for (let i = 0; i < keys.length; i++) {
-    let key = keys[i];
+    const key = keys[i];
     
     if (previousData[key] !== data[key]) {
       return true;
@@ -82,7 +83,7 @@ function dataDifferent(data) {
 }
 
 function thumbUpTrack() {
-  let btn = document.querySelector('#player .player-rating-container [icon^="sj:thumb-"][data-rating="5"]');  
+  const btn = document.querySelector('#player .player-rating-container [icon^="sj:thumb-"][data-rating="5"]');  
   btn && btn.click();
 }
 
@@ -96,7 +97,7 @@ function messageHandler(msg) {
 
 function updateData() {
   if (extensionConnected()) {
-    let data = scrape();
+    const data = scrape();
     
     if (!previousData || dataDifferent(data)) {
       chrome.runtime.sendMessage({

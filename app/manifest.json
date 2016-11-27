@@ -17,9 +17,10 @@
   },
   "permissions": [
     "tabs",
+    "notifications",
+    "storage",
     "http://ws.audioscrobbler.com/2.0/",
-    "*://play.google.com/music/*",
-    "notifications"
+    "*://play.google.com/music/*"
   ],
   "options_ui": {
     "page": "options.html",

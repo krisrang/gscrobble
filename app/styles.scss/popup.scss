@@ -1,0 +1,79 @@
+@import './common';
+
+body {
+  width: 250px;
+  min-height: 111px;
+  max-height: 201px;
+}
+
+.header {
+  background-image: -webkit-linear-gradient(top, #F44A51, #D82C30);
+  border-bottom: 1px solid #CCC;
+  color: #FFF;
+  font-size: 12px;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  
+  img {
+    padding-top: 5px;
+  }
+  
+  #options {
+    position: absolute;
+    right: 5px;
+    top: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  span {
+    @extend .noninteractive;
+  }
+  
+  i:hover {
+    color: #222;
+  }
+}
+
+.notplaying {
+  @extend .noninteractive;  
+  padding-top: 30px;
+  text-align: center;
+}
+
+.nowplaying {
+  background-image: -webkit-linear-gradient(top, rgb(254, 254, 254), rgb(230, 230, 230));
+  position: relative;
+  height: 80px;
+
+  img {
+    width: 70px;
+    height: 70px;
+    top: 5px;
+    left: 5px;
+    position: absolute;
+  }
+  
+  .artist, .title, .album {
+    width: 150px;
+    left: 85px;
+    position: absolute;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .artist {
+    top: 7px;
+  }
+
+  .title {
+    top: 23px;
+    font-weight: bold;
+  }
+
+  .album {
+    top: 40px;
+  }
+}
