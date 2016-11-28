@@ -4,6 +4,19 @@ import CurrentTrack from './common/current_track';
 
 Raven.config(config.ravenDSN).install();
 
+function reinsert() {
+  var manifest = chrome.runtime.getManifest(),
+      scripts = manifest.content_scripts[0].js;
+  
+  chrome.tabs.query(config.tabMatcher, function(tabs) {
+    for (let i in tabs) {
+      for (let k = 0; k < scripts.length; k++) {
+        chrome.tabs.executeScript(tabs[i].id, {file: scripts[k]});
+      }
+    }
+  });
+}
+
 function initialize() {
   window.currentTrack = new CurrentTrack();
   
@@ -23,18 +36,8 @@ function initialize() {
   });
   
   // (re)insert new version of extension into all open google play music tabs
-  chrome.runtime.onInstalled.addListener(function() {
-    var manifest = chrome.runtime.getManifest(),
-        scripts = manifest.content_scripts[0].js;
-    
-    chrome.tabs.query(config.tabMatcher, function(tabs) {
-      for (let i in tabs) {
-        for (let k = 0; k < scripts.length; k++) {
-          chrome.tabs.executeScript(tabs[i].id, {file: scripts[k]});
-        }
-      }
-    });
-  });
+  // chrome.runtime.onInstalled.addListener(reinsert);
+  reinsert();
 }
 
 initialize();
