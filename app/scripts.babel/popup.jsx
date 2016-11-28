@@ -60,8 +60,13 @@ class Popup extends React.Component {
           <div className="nowplaying">
             <img src={this.state.currentTrack.defaultImage} />
             <div className="artist">{this.state.currentTrack.artist}</div>
-            <div className="title">{this.state.currentTrack.title}</div>
-            <div className="album">{this.state.currentTrack.album}</div>
+            <div
+              className="title"
+              title={this.state.currentTrack.title}
+            >
+              {this.state.currentTrack.title}
+            </div>            
+            <div className="controls">{'Controls'}</div>
           </div>
         </div>
       );
