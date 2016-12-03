@@ -2,20 +2,20 @@
 
 body {
   width: 350px;
-  min-height: 141px;
+  min-height: 140px;
   max-height: 201px;
 }
 
 .header {
-  // background-image: -webkit-linear-gradient(top, #F44A51, #D82C30);
   background-color: #F21C1C;
-  border-bottom: 1px solid #CCC;
   color: #FFF;
   font-size: 12px;
   height: 30px;
   line-height: 30px;
   padding: 0 10px;
   border-radius: 3px 3px 0 0;
+  text-shadow: rgba(0, 0, 0, 0.45) 1px 1px 10px;
+  font-weight: bold;
   
   img {
     padding-top: 5px;
@@ -40,16 +40,36 @@ body {
 
 .notplaying {
   @extend .noninteractive;  
-  padding-top: 30px;
+  padding-top: 40px;
   text-align: center;
   border-radius: 0 0 3px 3px;
+  font-size: 16px;
+  background: rgba(0, 0, 0, .85);
+  color: #fff;
+  text-shadow: #000 1px 1px 10px;
+  height: 80px;
 }
 
 .nowplaying {
-  background-image: -webkit-linear-gradient(top, rgb(254, 254, 254), rgb(230, 230, 230));
+  // background-image: -webkit-linear-gradient(top, rgb(254, 254, 254), rgb(230, 230, 230));
+  background: #000;
   position: relative;
   height: 110px;
   border-radius: 0 0 3px 3px;
+  
+  .albumArt {
+    background-position-x: 50%;
+    background-position-y: 40%;
+    background-repeat-x: none;
+    background-repeat-y: none;
+    background-size: cover;
+    opacity: .45;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+  }
 
   img {
     width: 100px;
@@ -57,15 +77,18 @@ body {
     top: 5px;
     left: 5px;
     position: absolute;
+    display: none;
   }
   
   .artist, .title, .album, .controls {
-    width: 230px;
-    left: 110px;
+    width: 330px;
+    left: 10px;
     position: absolute;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: #fff;
+    text-shadow: #000 1px 1px 10px;
   }
   
   .artistalbum {
@@ -79,12 +102,13 @@ body {
 
   .artist {
     top: 7px;
+    font-size: 14px;
   }
 
   .title {
-    top: 25px;
+    top: 30px;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 22px;
   }
   
   .artistalbum {
@@ -93,9 +117,57 @@ body {
   
   .controls {
     top: 70px;
+    
+    a {
+      font-size: 20px;
+      padding: 0 10px 0 0;
+      
+      &.active {
+        color: #F21C1C;
+      }
+    }
+    
+    #loveTrackBtn {    
+      &.inactive i:hover:before {
+        content: $fa-var-heart;
+      }
+      
+      &.active i:before {
+        content: $fa-var-heart;
+      }
+    }
   }
 
   .album {
     top: 40px;
+  }
+  
+  .stats {
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    left: 175px;
+    color: #fff;
+    
+    .scrobbles, .listeners {
+      width: 45%;
+      text-align: center;
+      display: inline-block;
+      
+      .label, .value {
+        display: block;
+      }
+      
+      .label {
+        color: #DDD;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      
+      .value {
+        font-weight: bold;
+        font-size: 14px;
+      }
+    }
   }
 }

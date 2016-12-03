@@ -7,9 +7,14 @@ class CurrentTrack extends EventEmitter(Base) {
     this.current = null;
   }
   
-  setCurrent(track) {
-    this.current = track;    
-    this.emit('changed', track);
+  updateTrack(track) {
+    if (!this.current || this.current.differentTrack(track)) {
+      this.current = track;
+      this.emit('trackChanged', track);
+    } else if (this.current.playingChanged(track)) {
+      this.current.playing = track.playing;
+      this.emit('playingChanged', track);
+    }
   }
   
   getCurrent() {

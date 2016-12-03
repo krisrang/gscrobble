@@ -39,6 +39,23 @@ gulp.task('lint', lint(['app/scripts.babel/**/*.js', 'app/scripts.babel/**/*.jsx
   }
 }));
 
+var resizeImageTasks = [];
+[128, 64, 32, 24, 16].forEach(function(size) {
+  var resizeImageTask = 'imageresize_' + size;
+  gulp.task(resizeImageTask, function() {
+    return gulp.src('app/images.src/**/*.{jpg,png}')
+      .pipe($.imageResize({
+         width:  size,
+         height: size,
+         crop: true
+       }))
+      .pipe(rename(function (path) { path.basename += "-" + size; }))
+      .pipe(gulp.dest('app/images'))
+  });
+  resizeImageTasks.push(resizeImageTask);
+});
+gulp.task('imageresize', resizeImageTasks);
+
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
     .pipe($.if($.if.isFile, $.cache($.imagemin({
@@ -107,7 +124,7 @@ gulp.task('babel', () => {
     return browserify({
       entries: './app/scripts.babel/' + file,
       debug: true
-    }).transform('babelify', { presets: ['es2015'] })
+    }).transform('babelify', { presets: ['es2015', 'react'] })
       .bundle()
       .pipe(source(file))
       .pipe(rename({extname: '.js'}))
@@ -134,6 +151,7 @@ gulp.task('watch', ['lint', 'babel'], () => {
   gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
   gulp.watch('app/scripts.babel/**/*.jsx', ['lint', 'babel']);
   gulp.watch('app/styles.scss/**/*.scss', ['styles']);
+  gulp.watch('app/images.src/**/*.{jpg,png}', ['imageresize']);
   gulp.watch('bower.json', ['wiredep']);
 });
 

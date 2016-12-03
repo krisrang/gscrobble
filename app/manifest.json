@@ -5,6 +5,9 @@
   "description": "__MSG_appDescription__",
   "icons": {
     "16": "images/icon-16.png",
+    "24": "images/icon-24.png",
+    "32": "images/icon-32.png",
+    "64": "images/icon-64.png",
     "128": "images/icon-128.png"
   },
   "default_locale": "en",
@@ -41,8 +44,9 @@
   ],
   "browser_action": {
     "default_icon": {
-      "19": "images/icon-19.png",
-      "38": "images/icon-38.png"
+      "16": "images/as-16.png",
+      "24": "images/as-24.png",
+      "32": "images/as-32.png"
     },
     "default_title": "gscrobble",
     "default_popup": "popup.html"
@@ -58,8 +62,6 @@
     }
   },
   "web_accessible_resources": [
-    "images/icon-48.png",
-    "access-granted.html",
-    "bower_components/font_awesome/fonts/*"
+    "access-granted.html"
   ]
 }

@@ -1,6 +1,7 @@
 /* global Raven, currentTrack */
 import config from './common/config';
 import CurrentTrack from './common/current_track';
+import Track from './common/track';
 
 Raven.config(config.ravenDSN).install();
 
@@ -23,7 +24,8 @@ function initialize() {
   chrome.extension.onMessage.addListener((msg) => {
     console.log(msg);
     if (msg.name === 'nowplaying') {
-      currentTrack.setCurrent(msg.message);
+      let track = new Track(msg.message);
+      currentTrack.updateTrack(track);
     }
   });
   

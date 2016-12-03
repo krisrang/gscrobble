@@ -6,5 +6,37 @@
   "appDescription": {
     "message": "Scrobbler for Google Play Music",
     "description": "The description of the application"
+  },
+  "nowPlaying": {
+    "message": "Now Playing",
+    "description": "Message shown in header when currently playing"
+  },
+  "loveTrack": {
+    "message": "Love this track",
+    "description": "Title for button that loves current track"
+  },
+  "unLoveTrack": {
+    "message": "Unlove this track",
+    "description": "Title for button that unloves current track"
+  },
+  "skipTrack": {
+    "message": "Don't scrobble this track",
+    "description": "Title for button that sets current track to not scrobble"
+  },
+  "unSkipTrack": {
+    "message": "Scrobble this track",
+    "description": "Title for button that sets current track to scrobble"
+  },
+  "scrobbles": {
+    "message": "Scrobbles",
+    "description": "Label for field showing how many time user scrobbled track"
+  },
+  "listeners": {
+    "message": "Listeners",
+    "description": "Label for field showing how many listeners on last.fm the track has"
+  },
+  "nothingPlaying": {
+    "message": "Nothing Playing",
+    "description": "Default message in popup when nothing is playing"
   }
 }

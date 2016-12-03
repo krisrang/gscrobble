@@ -6,41 +6,52 @@ Raven.config(config.ravenDSN).install();
 const model = chrome.extension.getBackgroundPage();
 
 class HeaderView extends React.Component {  
-  constructor() {
-    super();
-    this.state = {
-      title: chrome.i18n.getMessage('appName')
-    };
-  }
-  
-  shouldComponentUpdate() {
-    return false;
+  shouldComponentUpdate(nextProps) {
+    return this.props.title !== nextProps.title;
   }
   
   render() {
     return (
       <div className="header">
-        <img src="images/google-w.png" />
-        <span>{this.state.title}</span>
+        <span>{this.props.title}</span>
       </div>
     );
   }
 }
 
+HeaderView.propTypes = {
+  title: React.PropTypes.string
+};
+
 const NotPlayingView = function() { 
-  return <div className="notplaying">{'Nothing playing'}</div>;
+  let text = chrome.i18n.getMessage('nothingPlaying');
+  return <div className="notplaying">{text}</div>;
 };
 
 class Popup extends React.Component {
   constructor() {
     super();
+    
+    let track = model.currentTrack.getCurrent();
     this.state = {
-      currentTrack: model.currentTrack.getCurrent()
+      currentTrack: track,
+      albumArtStyle: this.getTrackStyle(track),
+      loved: false,
+      skipped: false
     };
+    
+    this.translations = {};    
+    ['appName', 'loveTrack', 'unLoveTrack', 'skipTrack', 'unSkipTrack', 'scrobbles', 'listeners'].forEach((key) => {
+      this.translations[key] = chrome.i18n.getMessage(key);
+    });
+    
+    this.handleLoveClick = this.handleLoveClick.bind(this);
+    this.handleSkipClick = this.handleSkipClick.bind(this);
   }
   
   componentDidMount() {
-    model.currentTrack.addListener('changed', this.onTrackChanged.bind(this));
+    model.currentTrack.addListener('trackChanged', this.onTrackChanged.bind(this));
+    model.currentTrack.addListener('playingChanged', this.onTrackChanged.bind(this));
   }
   
   shouldComponentUpdate() {
@@ -48,32 +59,79 @@ class Popup extends React.Component {
   }
   
   onTrackChanged(track) {
-    this.setState({currentTrack: track});
+    this.setState({currentTrack: track, albumArtStyle: this.getTrackStyle(track)});
+  }
+  
+  getTrackStyle(track) {
+    let style = {};
+    
+    if (track && track.defaultImage) {
+      style = {backgroundImage: 'url(' + track.defaultImage.replace('s90-c', 's350-c') + ')'};
+    }
+    
+    return style;
+  }
+  
+  handleLoveClick() {
+    this.setState({loved: !this.state.loved});
+  }
+  
+  handleSkipClick() {
+    this.setState({skipped: !this.state.skipped});
   }
   
   render() {
+    let headerTitle = this.translations['appName'];
+    
     if (this.state.currentTrack && this.state.currentTrack.playing) {
+      headerTitle = headerTitle + ' - Now Playing';
+      
       return (
         <div>
-          <HeaderView />
+          <HeaderView title={headerTitle} />
 
           <div className="nowplaying">
-            <img src={this.state.currentTrack.defaultImage} />
+            <div className="albumArt" style={this.state.albumArtStyle} />
             <div className="artist">{this.state.currentTrack.artist}</div>
-            <div
-              className="title"
-              title={this.state.currentTrack.title}
-            >
+            <div className="title" title={this.state.currentTrack.title}>
               {this.state.currentTrack.title}
             </div>            
-            <div className="controls">{'Controls'}</div>
+            <div className="controls">
+              <a
+                className={this.state.loved ? 'active' : 'inactive'}
+                id="loveTrackBtn"
+                onClick={this.handleLoveClick}
+                title={this.state.loved ? this.translations['unLoveTrack'] : this.translations['loveTrack']}
+              >
+                <i aria-hidden="true" className="fa fa-heart-o" />
+              </a>
+              
+              <a
+                className={this.state.skipped && 'active'}
+                id="skipTrackBtn"
+                onClick={this.handleSkipClick}
+                title={this.state.skipped ? this.translations['unSkipTrack'] : this.translations['skipTrack']}
+              >
+                <i aria-hidden="true" className="fa fa-times" />
+              </a>
+            </div>
+            <div className="stats">
+              <div className="scrobbles">
+                <span className="label">{this.translations['scrobbles']}</span>
+                <span className="value">{'900'}</span>
+              </div>
+              <div className="listeners">
+                <span className="label">{this.translations['listeners']}</span>
+                <span className="value">{'9000K'}</span>
+              </div>
+            </div>
           </div>
         </div>
       );
     } else {
       return (
         <div>
-          <HeaderView />
+          <HeaderView title={headerTitle} />
           <NotPlayingView />
         </div>
       );
