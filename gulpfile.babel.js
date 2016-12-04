@@ -34,9 +34,7 @@ function lint(files, options) {
 }
 
 gulp.task('lint', lint(['app/scripts.babel/**/*.js', 'app/scripts.babel/**/*.jsx'], {
-  env: {
-    es6: true
-  }
+  envs: ["es6"]
 }));
 
 var resizeImageTasks = [];
@@ -148,8 +146,7 @@ gulp.task('watch', ['lint', 'babel'], () => {
     'app/_locales/**/*.json'
   ]).on('change', $.livereload.reload);
 
-  gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
-  gulp.watch('app/scripts.babel/**/*.jsx', ['lint', 'babel']);
+  gulp.watch('app/scripts.babel/**/*.{js,jsx}', ['lint', 'babel']);
   gulp.watch('app/styles.scss/**/*.scss', ['styles']);
   gulp.watch('app/images.src/**/*.{jpg,png}', ['imageresize']);
   gulp.watch('bower.json', ['wiredep']);
