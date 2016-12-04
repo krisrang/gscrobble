@@ -1,11 +1,17 @@
 /* global React, ReactDOM, Raven */
 import config from './common/config';
+import util from './common/util';
 
 Raven.config(config.ravenDSN).install();
 
 const model = chrome.extension.getBackgroundPage();
 
-class HeaderView extends React.Component {  
+const NotPlayingView = function() { 
+  let text = chrome.i18n.getMessage('nothingPlaying');
+  return <div className="notplaying">{text}</div>;
+};
+
+class HeaderView extends React.Component {
   shouldComponentUpdate(nextProps) {
     return this.props.title !== nextProps.title;
   }
@@ -23,9 +29,27 @@ HeaderView.propTypes = {
   title: React.PropTypes.string
 };
 
-const NotPlayingView = function() { 
-  let text = chrome.i18n.getMessage('nothingPlaying');
-  return <div className="notplaying">{text}</div>;
+class ProgressView extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return this.props.progress !== nextProps.progress;
+  }
+  
+  render() {
+    let cssClass = 'progress',
+        style = {right: util.roundTwo(350 / (100 / (100 - this.props.progress))) + 'px'};
+    
+    if (this.props.progress > 40) {
+      cssClass += ' scrobbled';
+    }
+    
+    return (
+      <div className={cssClass} style={style} />
+    );
+  }
+}
+
+ProgressView.propTypes = {
+  progress: React.PropTypes.number
 };
 
 class Popup extends React.Component {
@@ -52,6 +76,7 @@ class Popup extends React.Component {
   componentDidMount() {
     model.currentTrack.addListener('trackChanged', this.onTrackChanged.bind(this));
     model.currentTrack.addListener('playingChanged', this.onTrackChanged.bind(this));
+    model.currentTrack.addListener('progressChanged', this.onTrackChanged.bind(this));
   }
   
   shouldComponentUpdate() {
@@ -125,6 +150,8 @@ class Popup extends React.Component {
                 <span className="value">{'9000K'}</span>
               </div>
             </div>
+            
+            <ProgressView progress={this.state.currentTrack.progress} />
           </div>
         </div>
       );

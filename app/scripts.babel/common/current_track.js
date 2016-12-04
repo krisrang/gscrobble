@@ -12,8 +12,9 @@ class CurrentTrack extends EventEmitter(Base) {
       this.current = track;
       this.emit('trackChanged', track);
     } else if (this.current.playingChanged(track)) {
-      this.current.playing = track.playing;
       this.emit('playingChanged', track);
+    } else if (this.current.progressChanged(track)) {
+      this.emit('progressChanged', track);
     }
   }
   

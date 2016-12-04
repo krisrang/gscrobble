@@ -95,17 +95,23 @@ function messageHandler(msg) {
   }
 }
 
+function isLoaded() {
+  return !!document.querySelector('[data-id="play-pause"]');
+}
+
 function updateData() {
   if (extensionConnected()) {
-    const data = scrape();
-    
-    if (!previousData || dataDifferent(data)) {
-      chrome.runtime.sendMessage({
-        name: 'nowplaying',
-        message: data
-      });
-       
-      previousData = data;
+    if (isLoaded()) {
+      const data = scrape();
+      
+      if (!previousData || dataDifferent(data)) {
+        chrome.runtime.sendMessage({
+          name: 'nowplaying',
+          message: data
+        });
+         
+        previousData = data;
+      }
     }
   } else {
     scrapeInterval && clearInterval(scrapeInterval);
@@ -116,6 +122,6 @@ function updateData() {
 // init
 (function() {
   chrome.extension.onMessage.addListener(messageHandler);
-  scrapeInterval = setInterval(updateData, 2000);
+  scrapeInterval = setInterval(updateData, 1000);
   console.log('gscrobble:: installed in tab');
 })();

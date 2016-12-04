@@ -48,7 +48,7 @@
       "24": "images/as-24.png",
       "32": "images/as-32.png"
     },
-    "default_title": "gscrobble",
+    "default_title": "__MSG_appName__",
     "default_popup": "popup.html"
   },
   "commands": {
@@ -62,6 +62,6 @@
     }
   },
   "web_accessible_resources": [
-    "access-granted.html"
+    "callback.html"
   ]
 }

@@ -47,7 +47,7 @@ body {
   background: rgba(0, 0, 0, .85);
   color: #fff;
   text-shadow: #000 1px 1px 10px;
-  height: 80px;
+  height: 70px;
 }
 
 .nowplaying {
@@ -116,7 +116,7 @@ body {
   }
   
   .controls {
-    top: 70px;
+    top: 68px;
     
     a {
       font-size: 20px;
@@ -144,7 +144,7 @@ body {
   
   .stats {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     right: 0;
     left: 175px;
     color: #fff;
@@ -168,6 +168,23 @@ body {
         font-weight: bold;
         font-size: 14px;
       }
+    }
+  }
+  
+  .progress {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 4px;
+    background: #FF6334;
+    
+    &.scrobbled {
+      background: #00C856;
+    }
+    
+    &:hover {
+      height: 10px;
     }
   }
 }

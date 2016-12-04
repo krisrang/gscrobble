@@ -1,3 +1,5 @@
+import util from './util';
+
 class Track {
   constructor(data) {
     this.album = data.album;
@@ -8,8 +10,11 @@ class Track {
     this.playing = data.playing;
     this.thumbed = data.thumbed;
     this.defaultImage = data.defaultImage;
+    
     this.loved = null;
     this.skipped = null;
+    
+    this.progress = util.roundTwo(data.elapsed / (data.duration / 100));
   }
   
   differentTrack(track) {
@@ -17,7 +22,21 @@ class Track {
   }
   
   playingChanged(track) {
-    return this.playing !== track.playing;
+    if (this.playing !== track.playing) {
+      this.playing = track.playing;
+      return true;
+    }
+    
+    return false;
+  }
+  
+  progressChanged(track) {
+    if (this.elapsed !== track.elapsed) {
+      this.progress = util.roundTwo(track.elapsed / (track.duration / 100));
+      return true;
+    }
+    
+    return false;
   }
 }
 
