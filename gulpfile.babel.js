@@ -38,7 +38,7 @@ gulp.task('lint', lint(['app/scripts.babel/**/*.js', 'app/scripts.babel/**/*.jsx
 }));
 
 var resizeImageTasks = [];
-[128, 64, 32, 24, 16].forEach(function(size) {
+[128, 64, 48, 32, 24, 16].forEach(function(size) {
   var resizeImageTask = 'imageresize_' + size;
   gulp.task(resizeImageTask, function() {
     return gulp.src('app/images.src/**/*.{jpg,png}')
