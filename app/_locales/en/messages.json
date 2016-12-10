@@ -38,5 +38,9 @@
   "nothingPlaying": {
     "message": "Nothing Playing",
     "description": "Default message in popup when nothing is playing"
+  },
+  "signedOut": {
+    "message": "!!",
+    "description": "Title message for popup button when there is no last.fm token"
   }
 }

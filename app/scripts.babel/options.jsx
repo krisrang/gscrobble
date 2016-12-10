@@ -10,4 +10,4 @@ class Options extends React.Component {
   }
 }
 
-ReactDOM.render(<Options />, document.getElementById('accessgranted'));
+ReactDOM.render(<Options />, document.getElementById('contents'));

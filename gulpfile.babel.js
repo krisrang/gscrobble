@@ -115,7 +115,8 @@ gulp.task('babel', () => {
     'chromereload.js',
     'contentscript.js',
     'options.jsx',
-    'popup.jsx'
+    'popup.jsx',
+    'callback.jsx'
   ];
 
   let tasks = files.map( file => {

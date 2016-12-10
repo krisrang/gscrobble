@@ -177,14 +177,18 @@ body {
     right: 0;
     left: 0;
     height: 4px;
-    background: #FF6334;
-    
-    &.scrobbled {
-      background: #00C856;
-    }
     
     &:hover {
       height: 10px;
+    }
+    
+    .bar {
+      height: 100%;
+      background: #FF6334;      
+      
+      &.scrobbled {
+        background: #00C856;
+      }
     }
   }
 }

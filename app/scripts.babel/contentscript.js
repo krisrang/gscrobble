@@ -122,6 +122,6 @@ function updateData() {
 // init
 (function() {
   chrome.extension.onMessage.addListener(messageHandler);
-  scrapeInterval = setInterval(updateData, 1000);
+  scrapeInterval = setInterval(updateData, 1000);  
   console.log('gscrobble:: installed in tab');
 })();

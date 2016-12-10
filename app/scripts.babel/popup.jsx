@@ -11,22 +11,118 @@ const NotPlayingView = function() {
   return <div className="notplaying">{text}</div>;
 };
 
-class HeaderView extends React.Component {
-  shouldComponentUpdate(nextProps) {
-    return this.props.title !== nextProps.title;
+const HeaderView = function(props) { 
+  return (
+    <div className="header">
+      <span>{props.title}</span>
+    </div>
+  );
+};
+
+HeaderView.propTypes = {
+  title: React.PropTypes.string
+};
+
+class SignedOutView extends React.PureComponent {
+  constructor() {
+    super();
+    
+    this.translations = util.translations('loveTrack', 'unLoveTrack', 'skipTrack', 'unSkipTrack', 'scrobbles', 'listeners');    
+    this.handleSigninClick = this.handleSigninClick.bind(this);
+  }
+  
+  handleSigninClick() {
+    model.lastApi.openAuth();
   }
   
   render() {
     return (
-      <div className="header">
-        <span>{this.props.title}</span>
+      <div>
+        <button onClick={this.handleSigninClick}>{'Sign in'}</button>
       </div>
     );
   }
 }
 
-HeaderView.propTypes = {
-  title: React.PropTypes.string
+class NowPlayingView extends React.Component {
+  constructor() {
+    super();
+    
+    this.state = {
+      loved: false,
+      skipped: false
+    };
+    
+    this.translations = util.translations('loveTrack', 'unLoveTrack', 'skipTrack', 'unSkipTrack', 'scrobbles', 'listeners');
+    
+    this.handleLoveClick = this.handleLoveClick.bind(this);
+    this.handleSkipClick = this.handleSkipClick.bind(this);
+  }
+  
+  shouldComponentUpdate() {
+    return true;
+  }
+  
+  handleLoveClick() {
+    this.setState({loved: !this.state.loved});
+  }
+  
+  handleSkipClick() {
+    this.setState({skipped: !this.state.skipped});
+  }
+  
+  render() {
+    let albumArtStyle = {};
+    
+    if (this.props.track && this.props.track.defaultImage) {
+      albumArtStyle = {backgroundImage: 'url(' + this.props.track.defaultImage.replace('s90-c', 's350-c') + ')'};
+    }
+    
+    return (
+      <div className="nowplaying">
+        <div className="albumArt" style={albumArtStyle} />
+        <div className="artist">{this.props.track.artist}</div>
+        <div className="title" title={this.props.track.title}>
+          {this.props.track.title}
+        </div>            
+        <div className="controls">
+          <a
+            className={this.state.loved ? 'active' : 'inactive'}
+            id="loveTrackBtn"
+            onClick={this.handleLoveClick}
+            title={this.state.loved ? this.translations['unLoveTrack'] : this.translations['loveTrack']}
+          >
+            <i aria-hidden="true" className="fa fa-heart-o" />
+          </a>
+          
+          <a
+            className={this.state.skipped && 'active'}
+            id="skipTrackBtn"
+            onClick={this.handleSkipClick}
+            title={this.state.skipped ? this.translations['unSkipTrack'] : this.translations['skipTrack']}
+          >
+            <i aria-hidden="true" className="fa fa-times" />
+          </a>
+        </div>
+        <div className="stats">
+          <div className="scrobbles">
+            <span className="label">{this.translations['scrobbles']}</span>
+            <span className="value">{'900'}</span>
+          </div>
+          <div className="listeners">
+            <span className="label">{this.translations['listeners']}</span>
+            <span className="value">{'9000K'}</span>
+          </div>
+        </div>
+        
+        <ProgressView progress={this.props.track.progress} />
+      </div>
+    );
+  }
+}
+
+NowPlayingView.propTypes = {
+  track: React.PropTypes.number
 };
 
 class ProgressView extends React.Component {
@@ -35,15 +131,17 @@ class ProgressView extends React.Component {
   }
   
   render() {
-    let cssClass = 'progress',
-        style = {right: util.roundTwo(350 / (100 / (100 - this.props.progress))) + 'px'};
+    let cssClass = 'bar',
+        style = {width: this.props.progress + '%'};
     
     if (this.props.progress > 40) {
       cssClass += ' scrobbled';
     }
     
     return (
-      <div className={cssClass} style={style} />
+      <div className="progress">
+        <div className={cssClass} style={style} />
+      </div>
     );
   }
 }
@@ -59,24 +157,18 @@ class Popup extends React.Component {
     let track = model.currentTrack.getCurrent();
     this.state = {
       currentTrack: track,
-      albumArtStyle: this.getTrackStyle(track),
-      loved: false,
-      skipped: false
+      signedIn: model.lastApi.hasToken()
     };
     
-    this.translations = {};    
-    ['appName', 'loveTrack', 'unLoveTrack', 'skipTrack', 'unSkipTrack', 'scrobbles', 'listeners'].forEach((key) => {
-      this.translations[key] = chrome.i18n.getMessage(key);
-    });
-    
-    this.handleLoveClick = this.handleLoveClick.bind(this);
-    this.handleSkipClick = this.handleSkipClick.bind(this);
+    this.translations = util.translations('appName');
   }
   
   componentDidMount() {
     model.currentTrack.addListener('trackChanged', this.onTrackChanged.bind(this));
     model.currentTrack.addListener('playingChanged', this.onTrackChanged.bind(this));
     model.currentTrack.addListener('progressChanged', this.onTrackChanged.bind(this));
+    model.lastApi.addListener('signedOut', this.onLastTokenChanged.bind(this));
+    model.lastApi.addListener('signedIn', this.onLastTokenChanged.bind(this));
   }
   
   shouldComponentUpdate() {
@@ -84,75 +176,30 @@ class Popup extends React.Component {
   }
   
   onTrackChanged(track) {
-    this.setState({currentTrack: track, albumArtStyle: this.getTrackStyle(track)});
+    this.setState({currentTrack: track});
   }
   
-  getTrackStyle(track) {
-    let style = {};
-    
-    if (track && track.defaultImage) {
-      style = {backgroundImage: 'url(' + track.defaultImage.replace('s90-c', 's350-c') + ')'};
-    }
-    
-    return style;
-  }
-  
-  handleLoveClick() {
-    this.setState({loved: !this.state.loved});
-  }
-  
-  handleSkipClick() {
-    this.setState({skipped: !this.state.skipped});
+  onLastTokenChanged() {
+    this.setState({signedIn: model.lastApi.hasToken()});
   }
   
   render() {
     let headerTitle = this.translations['appName'];
     
-    if (this.state.currentTrack && this.state.currentTrack.playing) {
+    if (!this.state.signedIn) {
+      return (
+        <div>
+          <HeaderView title={headerTitle} />
+          <SignedOutView />
+        </div>
+      );
+    } else if (this.state.currentTrack && this.state.currentTrack.playing) {
       headerTitle = headerTitle + ' - Now Playing';
       
       return (
         <div>
           <HeaderView title={headerTitle} />
-
-          <div className="nowplaying">
-            <div className="albumArt" style={this.state.albumArtStyle} />
-            <div className="artist">{this.state.currentTrack.artist}</div>
-            <div className="title" title={this.state.currentTrack.title}>
-              {this.state.currentTrack.title}
-            </div>            
-            <div className="controls">
-              <a
-                className={this.state.loved ? 'active' : 'inactive'}
-                id="loveTrackBtn"
-                onClick={this.handleLoveClick}
-                title={this.state.loved ? this.translations['unLoveTrack'] : this.translations['loveTrack']}
-              >
-                <i aria-hidden="true" className="fa fa-heart-o" />
-              </a>
-              
-              <a
-                className={this.state.skipped && 'active'}
-                id="skipTrackBtn"
-                onClick={this.handleSkipClick}
-                title={this.state.skipped ? this.translations['unSkipTrack'] : this.translations['skipTrack']}
-              >
-                <i aria-hidden="true" className="fa fa-times" />
-              </a>
-            </div>
-            <div className="stats">
-              <div className="scrobbles">
-                <span className="label">{this.translations['scrobbles']}</span>
-                <span className="value">{'900'}</span>
-              </div>
-              <div className="listeners">
-                <span className="label">{this.translations['listeners']}</span>
-                <span className="value">{'9000K'}</span>
-              </div>
-            </div>
-            
-            <ProgressView progress={this.state.currentTrack.progress} />
-          </div>
+          <NowPlayingView track={this.state.currentTrack} />          
         </div>
       );
     } else {

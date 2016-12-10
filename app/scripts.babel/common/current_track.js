@@ -1,4 +1,5 @@
 import EventEmitter from './event_emitter';
+import Track from './track';
 
 class Base {}
 class CurrentTrack extends EventEmitter(Base) {
@@ -7,14 +8,16 @@ class CurrentTrack extends EventEmitter(Base) {
     this.current = null;
   }
   
-  updateTrack(track) {
-    if (!this.current || this.current.differentTrack(track)) {
-      this.current = track;
-      this.emit('trackChanged', track);
-    } else if (this.current.playingChanged(track)) {
-      this.emit('playingChanged', track);
-    } else if (this.current.progressChanged(track)) {
-      this.emit('progressChanged', track);
+  updateTrack(data) {
+    if (!this.current || this.current.trackChanged(data)) {
+      this.current = new Track(data);
+      this.emit('trackChanged', this.current);
+    } else if (this.current.playingChanged(data)) {
+      this.emit('playingChanged', this.current);
+    } else if (this.current.progressChanged(data)) {
+      this.emit('progressChanged', this.current);
+    } else if (this.current.thumbedChanged(data)) {
+      this.emit('thumbedChanged', this.current);
     }
   }
   
