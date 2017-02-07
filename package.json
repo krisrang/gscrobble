@@ -43,7 +43,11 @@
       "browser": true
     },
     "globals": {
-      "chrome": true
+      "chrome": true,
+      "$": true,
+      "React": true,
+      "ReactDOM": true,
+      "Raven": true
     },
     "rules": {
       "eol-last": 0,

@@ -1,4 +1,3 @@
-/* global Raven */
 import config from './common/config';
 import CurrentTrack from './common/current_track';
 import LastApi from './common/last_api';
@@ -32,6 +31,7 @@ function setup() {
     }
   });
 }
+
 function initialize() {
   window.currentTrack = new CurrentTrack();
   window.lastApi = new LastApi();

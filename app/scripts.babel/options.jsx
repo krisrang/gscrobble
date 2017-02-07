@@ -1,4 +1,6 @@
-/* global React, ReactDOM */
+import config from './common/config';
+
+Raven.config(config.ravenDSN).install();
 
 class Options extends React.Component {
   shouldComponentUpdate () {

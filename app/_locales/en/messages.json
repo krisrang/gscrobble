@@ -42,5 +42,17 @@
   "signedOut": {
     "message": "!!",
     "description": "Title message for popup button when there is no last.fm token"
+  },
+  "signIn": {
+    "message": "Connect to Last.fm",
+    "description": "Button label for connecting to last.fm account"
+  },
+  "signedIn": {
+    "message": "Connected last.fm account.\nYou can close this tab now.",
+    "description": "Successfully logged into last.fm"
+  },
+  "signinError": {
+    "message": "Something went wrong.\nPlease contact support.",
+    "description": "Error when logging into last.fm"
   }
 }

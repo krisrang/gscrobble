@@ -1,4 +1,3 @@
-/* global React, ReactDOM, Raven */
 import config from './common/config';
 import util from './common/util';
 
@@ -27,7 +26,7 @@ class SignedOutView extends React.PureComponent {
   constructor() {
     super();
     
-    this.translations = util.translations('loveTrack', 'unLoveTrack', 'skipTrack', 'unSkipTrack', 'scrobbles', 'listeners');    
+    this.translations = util.translations('signIn');    
     this.handleSigninClick = this.handleSigninClick.bind(this);
   }
   
@@ -37,8 +36,8 @@ class SignedOutView extends React.PureComponent {
   
   render() {
     return (
-      <div>
-        <button onClick={this.handleSigninClick}>{'Sign in'}</button>
+      <div className="signedOut">
+        <button onClick={this.handleSigninClick}>{this.translations['signIn']}</button>
       </div>
     );
   }
@@ -107,11 +106,11 @@ class NowPlayingView extends React.Component {
         <div className="stats">
           <div className="scrobbles">
             <span className="label">{this.translations['scrobbles']}</span>
-            <span className="value">{'900'}</span>
+            <span className="value">{this.props.track.playCount}</span>
           </div>
           <div className="listeners">
             <span className="label">{this.translations['listeners']}</span>
-            <span className="value">{'9000K'}</span>
+            <span className="value">{this.props.track.listeners}</span>
           </div>
         </div>
         
