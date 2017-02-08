@@ -10,13 +10,28 @@ const NotPlayingView = function() {
   return <div className="notplaying">{text}</div>;
 };
 
-const HeaderView = function(props) { 
-  return (
-    <div className="header">
-      <span>{props.title}</span>
-    </div>
-  );
-};
+class HeaderView extends React.PureComponent {
+  constructor() {
+    super();
+     
+    this.handleOptionsClick = this.handleOptionsClick.bind(this);
+  }
+  
+  handleOptionsClick() {
+    chrome.runtime.openOptionsPage();
+  }
+  
+  render() {
+    return (
+      <div className="header">
+        <span>{this.props.title}</span>
+        <a id="options" onClick={this.handleOptionsClick}>
+          <i aria-hidden="true" className="fa fa-cog" />
+        </a>
+      </div>
+    );
+  }
+}
 
 HeaderView.propTypes = {
   title: React.PropTypes.string
@@ -31,7 +46,7 @@ class SignedOutView extends React.PureComponent {
   }
   
   handleSigninClick() {
-    model.lastApi.openAuth();
+    model.lastApi.signIn();
   }
   
   render() {
@@ -47,11 +62,6 @@ class NowPlayingView extends React.Component {
   constructor() {
     super();
     
-    this.state = {
-      loved: false,
-      skipped: false
-    };
-    
     this.translations = util.translations('loveTrack', 'unLoveTrack', 'skipTrack', 'unSkipTrack', 'scrobbles', 'listeners');
     
     this.handleLoveClick = this.handleLoveClick.bind(this);
@@ -63,18 +73,40 @@ class NowPlayingView extends React.Component {
   }
   
   handleLoveClick() {
-    this.setState({loved: !this.state.loved});
+    model.currentTrack.toggleLove();
   }
   
   handleSkipClick() {
-    this.setState({skipped: !this.state.skipped});
+    model.currentTrack.toggleSkip();
   }
   
   render() {
-    let albumArtStyle = {};
+    let albumArtStyle = {},
+        lovePart;
     
     if (this.props.track && this.props.track.defaultImage) {
-      albumArtStyle = {backgroundImage: 'url(' + this.props.track.defaultImage.replace('s90-c', 's350-c') + ')'};
+      let img = this.props.track.defaultImage;
+      img = img.replace('s90-c', 's350-c');
+      albumArtStyle = {backgroundImage: 'url(' + img + ')'};
+    }
+    
+    if (this.props.track.loving || this.props.track.loved === null) {
+      lovePart = (
+        <a className="loading">
+          <img src="images/spinner-w.svg" />
+        </a>
+      );
+    } else {
+      lovePart = (
+        <a
+          className={this.props.track.loved ? 'active' : 'inactive'}
+          id="loveTrackBtn"
+          onClick={this.handleLoveClick}
+          title={this.props.track.loved ? this.translations['unLoveTrack'] : this.translations['loveTrack']}
+        >
+          <i aria-hidden="true" className="fa fa-heart-o" />
+        </a>
+      );
     }
     
     return (
@@ -85,20 +117,13 @@ class NowPlayingView extends React.Component {
           {this.props.track.title}
         </div>            
         <div className="controls">
+          {lovePart}
+                    
           <a
-            className={this.state.loved ? 'active' : 'inactive'}
-            id="loveTrackBtn"
-            onClick={this.handleLoveClick}
-            title={this.state.loved ? this.translations['unLoveTrack'] : this.translations['loveTrack']}
-          >
-            <i aria-hidden="true" className="fa fa-heart-o" />
-          </a>
-          
-          <a
-            className={this.state.skipped && 'active'}
+            className={this.props.track.skip && 'active'}
             id="skipTrackBtn"
             onClick={this.handleSkipClick}
-            title={this.state.skipped ? this.translations['unSkipTrack'] : this.translations['skipTrack']}
+            title={this.props.track.skip ? this.translations['unSkipTrack'] : this.translations['skipTrack']}
           >
             <i aria-hidden="true" className="fa fa-times" />
           </a>
@@ -114,14 +139,30 @@ class NowPlayingView extends React.Component {
           </div>
         </div>
         
-        <ProgressView progress={this.props.track.progress} />
+        <ProgressView progress={this.props.track.progress} skip={this.props.track.skip} />
       </div>
     );
   }
 }
 
 NowPlayingView.propTypes = {
-  track: React.PropTypes.number
+  track: React.PropTypes.shape({
+    defaultImage: React.PropTypes.string,
+    artist: React.PropTypes.string,
+    title: React.PropTypes.string,
+    progress: React.PropTypes.number,
+    skip: React.PropTypes.bool,
+    loved: React.PropTypes.bool,
+    loving: React.PropTypes.bool,
+    playCount: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number,
+    ]),
+    listeners: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number,
+    ]),
+  })
 };
 
 class ProgressView extends React.Component {
@@ -133,7 +174,7 @@ class ProgressView extends React.Component {
     let cssClass = 'bar',
         style = {width: this.props.progress + '%'};
     
-    if (this.props.progress > 40) {
+    if (this.props.progress > 40 && !this.props.skip) {
       cssClass += ' scrobbled';
     }
     
@@ -146,7 +187,8 @@ class ProgressView extends React.Component {
 }
 
 ProgressView.propTypes = {
-  progress: React.PropTypes.number
+  progress: React.PropTypes.number,
+  skip: React.PropTypes.bool
 };
 
 class Popup extends React.Component {
@@ -166,6 +208,8 @@ class Popup extends React.Component {
     model.currentTrack.addListener('trackChanged', this.onTrackChanged.bind(this));
     model.currentTrack.addListener('playingChanged', this.onTrackChanged.bind(this));
     model.currentTrack.addListener('progressChanged', this.onTrackChanged.bind(this));
+    model.currentTrack.addListener('lovingChanged', this.onTrackChanged.bind(this));
+    model.currentTrack.addListener('skipChanged', this.onTrackChanged.bind(this));
     model.lastApi.addListener('signedOut', this.onLastTokenChanged.bind(this));
     model.lastApi.addListener('signedIn', this.onLastTokenChanged.bind(this));
   }

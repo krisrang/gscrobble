@@ -10,7 +10,7 @@ class CurrentTrack extends EventEmitter(Base) {
   
   updateTrack(data) {
     if (!this.current || this.current.trackChanged(data)) {
-      this.current = new Track(data);
+      this.current = new Track(data, this);
       this.emit('trackChanged', this.current);
     } else if (this.current.playingChanged(data)) {
       this.emit('playingChanged', this.current);
@@ -23,6 +23,16 @@ class CurrentTrack extends EventEmitter(Base) {
   
   getCurrent() {
     return this.current;
+  }
+  
+  toggleLove() {
+    this.current.toggleLove();
+    this.emit('lovingChanged', this.current);
+  }
+  
+  toggleSkip() {
+    this.current.toggleSkip();
+    this.emit('skipChanged', this.current);
   }
 }
 

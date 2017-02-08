@@ -1,4 +1,3 @@
-/* global Raven */
 import config from './common/config';
 
 Raven.config(config.ravenDSN).install();

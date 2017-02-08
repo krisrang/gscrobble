@@ -23,8 +23,8 @@ body {
   
   #options {
     position: absolute;
-    right: 5px;
-    top: 6px;
+    right: 10px;
+    top: 1px;
     font-size: 16px;
     cursor: pointer;
   }
@@ -33,7 +33,7 @@ body {
     @extend .noninteractive;
   }
   
-  i:hover {
+  a:hover {
     color: #222;
   }
 }
@@ -69,15 +69,6 @@ body {
     bottom: 0;
     right: 0;
     top: 0;
-  }
-
-  img {
-    width: 100px;
-    height: 100px;
-    top: 5px;
-    left: 5px;
-    position: absolute;
-    display: none;
   }
   
   .artist, .title, .album, .controls {
@@ -124,6 +115,19 @@ body {
       
       &.active {
         color: #F21C1C;
+      }
+      
+      &.loading:hover {
+        cursor: default;
+      }
+      
+      img {
+        width: 20px;
+        vertical-align: middle;
+      }
+      
+      i {
+        vertical-align: middle;
       }
     }
     

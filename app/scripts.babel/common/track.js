@@ -1,7 +1,9 @@
 import util from './util';
 
 class Track {
-  constructor(data) {
+  constructor(data, base) {
+    this.base = base;
+    
     this.album = data.album;
     this.artist = data.artist;
     this.title = data.title;
@@ -11,20 +13,22 @@ class Track {
     this.thumbed = data.thumbed;
     this.defaultImage = data.defaultImage;
     this.listeners = '-';
-    this.playCount = '-';
+    this.playCount = '-';    
+    this.loved = false;    
+    this.mbid = null;    
+    this.loved = null;
+    this.skip = null;
+    
     this.scrobbled = false;
     this.scrobbling = false;
     this.updatingNowPlaying = false;
     this.updatedNowPlaying = 0;
-    this.mbid = null;
-    
-    this.loved = null;
-    this.skipped = null;
+    this.loving = false;
     
     this.progress = util.percent(data.elapsed, data.duration);
     this.started = Math.round(Date.now() / 1000) - this.elapsed;
     
-    window.lastApi.addListener('signedIn', this.updateTrackInfo.bind(this));
+    window.lastApi.addListener('signedIn', this.signedIn.bind(this));
     this.updateTrackInfo();
     this.updateNowPlaying();
   }
@@ -38,7 +42,7 @@ class Track {
   }
   
   playingChanged(data) {
-    if (this.playing !== data.playing) {
+    if (this.playing !== data.playing) {      
       this.playing = data.playing;
       
       if (this.playing) {
@@ -65,7 +69,7 @@ class Track {
       this.elapsed = data.elapsed;
       this.progress = util.percent(data.elapsed, data.duration);
       
-      this.updateNowPlaying();      
+      this.updateNowPlaying();
       if (this.progress >= 40) {
         this.scrobble();
       }
@@ -75,18 +79,36 @@ class Track {
     return false;
   }
   
+  toggleLove() {
+    if (this.loved) {
+      this.unLoveTrack();
+    } else {
+      this.loveTrack();
+    }
+  }
+  
+  toggleSkip() {
+    this.skip = !this.skip;
+  }
+  
+  signedIn() {
+    this.updateTrackInfo();
+    this.updateNowPlaying();
+  }
+  
   updateTrackInfo() {
     window.lastApi.getTrackInfo(this.title, this.artist, (result) => {
       if (result && result.track) {
         this.listeners = result.track.listeners;
         this.playCount = result.track.userplaycount || 0;
         this.mbid = result.track.mbid;
+        this.loved = result.track.userloved === '1';
       }
     });
   }
   
   scrobble() {
-    if (this.scrobbled || this.scrobbling) {
+    if (this.scrobbled || this.scrobbling || this.skip) {
       return;
     }
     
@@ -103,7 +125,7 @@ class Track {
   }
   
   updateNowPlaying() {
-    if (!this.playing || this.scrobbled || this.scrobbling || this.updatingNowPlaying || this.updatedNowPlaying > Date.now() - 15000) {
+    if (!this.playing || this.skip || this.scrobbled || this.scrobbling || this.updatingNowPlaying || this.updatedNowPlaying > Date.now() - 15000) {
       return;
     }
     
@@ -114,6 +136,42 @@ class Track {
         this.updatingNowPlaying = false;
         this.updatedNowPlaying = Date.now();
       }
+    });
+  }
+  
+  loveTrack() {
+    if (this.loving) {
+      return;
+    }
+    
+    this.loving = true;
+    
+    window.lastApi.loveTrack(this.title, this.artist, (result) => {
+      this.loving = false;
+      
+      if (result) {        
+        this.loved = true;
+      }
+      
+      this.base.emit('lovingChanged', this);
+    });
+  }
+  
+  unLoveTrack() {
+    if (this.loving) {
+      return;
+    }
+    
+    this.loving = true;
+    
+    window.lastApi.unLoveTrack(this.title, this.artist, (result) => {
+      this.loving = false;
+      
+      if (result) {
+        this.loved = false;        
+      }
+      
+      this.base.emit('lovingChanged', this);
     });
   }
 }

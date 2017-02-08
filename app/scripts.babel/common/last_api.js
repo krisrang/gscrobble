@@ -23,14 +23,22 @@ class LastApi extends EventEmitter(Base) {
     });
   }
   
-  openAuth() {
+  signIn() {
     chrome.tabs.create({
       url: 'http://www.last.fm/api/auth/?api_key=' + config.lastKey + '&cb=' + chrome.extension.getURL('callback.html')
     });
   }
   
+  signOut() {
+    this.deleteSession();
+  }
+  
   hasToken() {
     return !!this.session && !!this.session.key;
+  }
+  
+  getSession() {
+    return this.session;
   }
   
   setSession(session) {
@@ -124,6 +132,10 @@ class LastApi extends EventEmitter(Base) {
       params.api_sig = this.getApiSignature(params);
     }
     
+    if (method === 'auth.getSession') {
+      params.api_sig = this.getApiSignature(params);
+    }
+    
     return $.ajax({
       url: config.lastAPI + '?format=json',
       method: (requirePost.indexOf(method) >= 0 ? 'POST' : 'GET'),
@@ -152,7 +164,7 @@ class LastApi extends EventEmitter(Base) {
   
   getTrackInfo(track, artist, callback) {
     if (!this.hasToken()) {
-      return callback(false);
+      return callback({track: false});
     }
     
     let data = {
@@ -172,7 +184,7 @@ class LastApi extends EventEmitter(Base) {
   
   scrobble(track, artist, album, timestamp, mbid, callback) {
     if (!this.hasToken()) {
-      return callback(false);
+      return callback({scrobbles: {'@attr': {accepted: 0}}});
     }
     
     let data = {
@@ -200,7 +212,7 @@ class LastApi extends EventEmitter(Base) {
   
   updateNowPlaying(track, artist, album, mbid, callback) {
     if (!this.hasToken()) {
-      return callback(false);
+      return callback({nowplaying: true});
     }
     
     let data = {
@@ -217,6 +229,44 @@ class LastApi extends EventEmitter(Base) {
     }
     
     this.apiRequest('track.updateNowPlaying', data)
+      .done(function(data) {
+        callback(data);
+      })
+      .fail(function() {
+        callback(false);
+      });
+  }
+  
+  loveTrack(track, artist, callback) {
+    if (!this.hasToken()) {
+      return callback({nowplaying: true});
+    }
+    
+    let data = {
+      track: track,
+      artist: artist
+    };
+    
+    this.apiRequest('track.love', data)
+      .done(function(data) {
+        callback(data);
+      })
+      .fail(function() {
+        callback(false);
+      });
+  }
+  
+  unLoveTrack(track, artist, callback) {
+    if (!this.hasToken()) {
+      return callback(true);
+    }
+    
+    let data = {
+      track: track,
+      artist: artist
+    };
+    
+    this.apiRequest('track.unlove', data)
       .done(function(data) {
         callback(data);
       })

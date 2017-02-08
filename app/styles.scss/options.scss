@@ -1,4 +1,35 @@
-$padding: 20px;
+@import './common';
+
 body {
-  padding: $padding;
+  padding: 20px;
+}
+
+section {
+  margin-bottom: 30px;
+  
+  h1 {
+    margin: 0 0 10px;
+    border-left: 3px solid #FF613E;
+    padding-left: 5px;
+    margin-left: -8px;
+  }
+  
+  .account {
+    .accountDetails {
+      float: left;
+    }
+    
+    button {
+      float: right;
+      padding: 5px;
+      margin-top: 5px !important;
+    }
+  }
+  
+  .option {
+    select {
+      float: right;
+      margin-top: -4px;
+    }
+  }
 }

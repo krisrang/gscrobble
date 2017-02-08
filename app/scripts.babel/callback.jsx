@@ -1,4 +1,3 @@
-/* global React, ReactDOM, Raven */
 import config from './common/config';
 import util from './common/util';
 

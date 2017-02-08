@@ -47,6 +47,10 @@
     "message": "Connect to Last.fm",
     "description": "Button label for connecting to last.fm account"
   },
+  "signOut": {
+    "message": "Disconnect Last.fm account",
+    "description": "Button label for disconnecting last.fm account"
+  },
   "signedIn": {
     "message": "Connected last.fm account.\nYou can close this tab now.",
     "description": "Successfully logged into last.fm"
