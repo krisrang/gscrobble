@@ -15,6 +15,7 @@ gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
+    'app/bower_components/font-awesome/fonts/**',
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html',
@@ -82,7 +83,10 @@ gulp.task('styles', () => {
 
 gulp.task('html', ['styles'], () => {
   return gulp.src('app/*.html')
-    .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
+    .pipe($.useref({searchPath: ['.tmp', 'app', '.'], transformPath: function(path) {
+      path = path.replace('react.js', 'react.min.js');
+      return path.replace('react-dom.js', 'react-dom.min.js');
+    }}))
     .pipe($.sourcemaps.init())
     .pipe($.if('*.js', $.uglify()))
     .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
